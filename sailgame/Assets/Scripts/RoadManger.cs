@@ -61,7 +61,7 @@ public class RoadManger : MonoBehaviour
             Destroy(activeRoads[0]);
             activeRoads.RemoveAt(0);
         }
-        else
+        else//會有debug訊息
         {
             Debug.LogWarning("No roads to delete.");
         }
