@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -15,7 +14,20 @@ public class PlayerController : MonoBehaviour
     public float delayBeforeExit=2.0f;
     public float maxSpeed;
 
+    // -1 0 1
+    private int _dir;
+
     private float initialY; // 記錄跳躍起始點的 Y 軸位置
+
+    private void OnEnable()
+    {
+        SerialReader.Instance.OnDataReceived += OnDataReceived;
+    }
+
+    private void OnDisable()
+    {
+        SerialReader.Instance.OnDataReceived -= OnDataReceived;
+    }
 
     void Start()// 物件出現運行
     {
@@ -40,19 +52,24 @@ public class PlayerController : MonoBehaviour
             Jump();
         }
 
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        if (_dir == 1)
         {
             desiredLane++;
             if (desiredLane == 3)
                 desiredLane = 2;//讓它往右不會超出地圖
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        else if (_dir == -1)
         {
             desiredLane--;
             if (desiredLane == -1)
                 desiredLane = 0;//讓它往左不會超出地圖
         }
+        else
+        {
+            desiredLane = 1;
+        }
+        
 
         Vector3 targetPosition = transform.position.z * transform.forward + transform.position.y * transform.up;
 
@@ -93,7 +110,15 @@ public class PlayerController : MonoBehaviour
             PlayerManger.gameOver = true;
         }
     }
-
+    private void OnDataReceived(float data)
+    {
+        if(data > 7f)
+            _dir = 1;
+        else if(data < -7f)
+            _dir = -1;
+        else
+            _dir = 0;
+    }
 
 }
 
